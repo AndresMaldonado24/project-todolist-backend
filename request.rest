@@ -1,20 +1,19 @@
-GET http://localhost:3000/users
-
 ####
-
-POST http://localhost:3000/users
+POST http://localhost:3000/auth/register
 Content-Type: application/json
 
 {
     "name" : "Horacio",
-    "pass" : "OHn.bferoq"
+    "password" : "OHn.bferoq",
+    "email" : "Horacio@fafetaxi.com"
 }
-###
 
-POST http://localhost:3000/login
+###
+PUT http://localhost:3000/auth/update/user/63e8321b99f850c3538a57b0
 Content-Type: application/json
 
 {
-    "name" : "Horacio",
-    "pass" : "OHn.bferoq"
+    "name" : "Horacio Gonzales",
+    "password" : "OHn.bferoq",
+    "email" : "Horacio@gmail.com"
 }
