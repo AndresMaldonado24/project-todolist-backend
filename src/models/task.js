@@ -1,10 +1,6 @@
 const mongoose = require('mongoose')
 
 const TaskSchema = mongoose.Schema({
-    id: {
-        type: Number,
-        required: true
-    },
     title : {
         type: String,
         required: true
@@ -20,6 +16,10 @@ const TaskSchema = mongoose.Schema({
     date: {
         type: Date,
         default: Date.now
+    },
+    active : {
+        type : Boolean,
+        required : true
     }
 })
 

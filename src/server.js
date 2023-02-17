@@ -23,7 +23,7 @@ app.use(express.json())
 app.use(cors())
 /*################Routes################*/
 app.use('/auth/',authRoutes)
-app.use('/task/',taskRoutes)
+app.use('/api/',taskRoutes)
 /*################Start server################*/
 app.listen(app.get('port'), () => {
 	console.log(`Server started on port ${app.get('port')}`)

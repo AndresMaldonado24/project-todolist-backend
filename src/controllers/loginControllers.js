@@ -35,22 +35,27 @@ exports.aunthenticateUser = async (req,res) => {
 	//console.log(User._id.toHexString());
 	try{
 		if(await bcrypt.compare(req.body.password, User.password)){
-			const UserId = { id : User._id.toHexString() }
-			console.log(UserId);
-			const accessToken = jwt.sign(UserId, process.env.ACCESS_TOKEN_SECRET)
-			res.json(accessToken)
+			const UserSing = { id : User._id.toHexString() , email : User.email }
+			const accessToken = jwt.sign(UserSing, process.env.ACCESS_TOKEN_SECRET)
+			res.json( {
+				accessToken: accessToken,
+				userId: User._id.toHexString(),
+				userName : User.username
+			})
 		}else{
-			console.log('NOT ALLOWED')
+			res.status(403).send('Not Allowed')
 		}
 	}
-	catch{
-		 res.status(500).send('Unknow Error!')
+	catch(err){
+		 res.status(500).send(err)
 	}
 
 }
 
 exports.aunthenticateToken = (req,res,next) => {
+
 	const authHeader = req.headers['authorization']
+
 	const token = authHeader && authHeader.split(' ')[1]
 
 	if(token == null) return res.sendStatus(401)
