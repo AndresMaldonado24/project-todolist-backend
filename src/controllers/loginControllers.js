@@ -1,74 +1,63 @@
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+require('dotenv').config()
 
 //Schemas
 const UserSchema = require('../models/users')
 
 exports.createUser = async (req,res) => {
-	const EmailAlreadyInUse = Boolean((await UserSchema.find({ email: req.body.email })).length)
+	
+	const UserExist = await UserSchema.findOne({ email: req.body.email })
+
+	if( UserExist !== null){
+		return res.status(409).send('Email alrady in use')
+	}
+
 	try{
-		if(!EmailAlreadyInUse){
-			const hashedPassword = await bcrypt.hash(req.body.password, 10)
-			const  NewUserData = { name: req.body.name, password: hashedPassword, email : req.body.email}
-			UserSchema(NewUserData)
-				.save()
-				.then( () => res.status(201).send('User was created sucsefully'))
-				.catch( (err) => res.status(500).send(err))
-		}
-		else{
-			res.status(409).send('Email alrady in use')
-		}
+		const hashedPassword = await bcrypt.hash(req.body.password, 10)
+		const  NewUserData = { username: req.body.username, password: hashedPassword, email : req.body.email}
+		UserSchema(NewUserData)
+		.save()
+		.then( () => res.status(201).send('User was created sucsefully'))
+		.catch( (err) => res.status(500).send(err))
 	}catch(err){
-			res.status(500).send(err)
+		res.status(500).send(err)
 	}
 }
 
 exports.aunthenticateUser = async (req,res) => {
 
-	const User = UserSchema.find({ email: req.body.email})
+	const User = await UserSchema.findOne({ email: req.body.email})
 
 	if( User == null){
 		return res.status(400).send('Cannnot find user')
 	}
-
+	//console.log(User._id.toHexString());
 	try{
-		if( await bcrypt.compare(req.body.pass, User.pass)){
-			res.status(200).send('Success')
+		if(await bcrypt.compare(req.body.password, User.password)){
+			const UserId = { id : User._id.toHexString() }
+			console.log(UserId);
+			const accessToken = jwt.sign(UserId, process.env.ACCESS_TOKEN_SECRET)
+			res.json(accessToken)
 		}else{
-			res.status(401).send('Not allowed')
+			console.log('NOT ALLOWED')
 		}
-	}catch(err) {
-		res.status(500).send(err)
 	}
+	catch{
+		 res.status(500).send('Unknow Error!')
+	}
+
 }
 
-exports.updateUser = async (req,res) => {
-	const {id} = req.params
-	const {name,password,email} = req.body
+exports.aunthenticateToken = (req,res,next) => {
+	const authHeader = req.headers['authorization']
+	const token = authHeader && authHeader.split(' ')[1]
 
-	const User =	await UserSchema
-	.findById(id)
-	.then( (data) => data)
-	.catch( () => false)
+	if(token == null) return res.sendStatus(401)
 
-	if( User == false){
-		res.status(404).send('User not found')
-	}else{
-		const EmailAlreadyInUse = Boolean((await UserSchema.find({ email: email })).length)
-		const VerifiedPassword = await bcrypt.compare(password, User.password)
-		if(!EmailAlreadyInUse){
-			if(VerifiedPassword){
-				UserSchema
-				.updateOne(
-					{ _id : id },
-					{	$set : {name,email} })
-				.then( () => res.status(200).send('User updated sucsefully'))
-				.catch( (err) => res.status(500).send(err))
-			}else{
-				res.status(401).send('Not Allowed')
-			}
-		}else{
-			res.status(409).send('Email alrady in use')
-		}
-		
-	}
+	jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err,user) => {
+		if(err) return res.sendStatus(403)
+		req.user = user
+		next()
+	})
 }

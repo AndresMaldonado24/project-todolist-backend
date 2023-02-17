@@ -8,7 +8,4 @@ router.post('/register', loginControllers.createUser )
 
 router.post('/login', loginControllers.aunthenticateUser )
 
-router.put('/update/user/:id', loginControllers.updateUser )
-
-
 module.exports = router
