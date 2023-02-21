@@ -8,7 +8,7 @@ const app = express()
 const authRoutes = require('./routes/authRoutes')
 const taskRoutes = require('./routes/toDoRoutes')
 
-const whiteList = ['http://localhost:5173']
+const whiteList = ['http://localhost:5173', 'https://andresmaldonado24.github.io/project-portfolio/']
 
 /*################Settings################*/
 app.set('port', process.env.PORT || 3000)
