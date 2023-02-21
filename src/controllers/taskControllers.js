@@ -63,9 +63,14 @@ exports.removeTask = async (req, res) => {
 	Task.active = !Task.active
 	Task.save()
 	.then( () => res.status(200).send('Update Task Sucsefully!'))
-	.catch( (err) => console.log(err) )
+	.catch( (err) => res.status(500).send(err) )
 }
 
 exports.removeCompletedTask = async (req, res) => {
-	return res.sendStatus(200)
+	await TaskSchema.updateMany(
+		{ _id :{ $in : req.body.data } },
+		{ $set : { active : false }}
+	)
+	.then( () => res.status(200).send('Update Task Sucsefully!'))
+	.catch( (err) => res.status(500).send(err) )
 }

@@ -8,6 +8,8 @@ const app = express()
 const authRoutes = require('./routes/authRoutes')
 const taskRoutes = require('./routes/toDoRoutes')
 
+const whiteList = ['http://localhost:5173']
+
 /*################Settings################*/
 app.set('port', process.env.PORT || 3000)
 /*################Mongo Connetcion################*/
@@ -20,7 +22,7 @@ app.use( (req,res,next) => {
 	next()
 });
 app.use(express.json())
-app.use(cors())
+app.use(cors({ origin : whiteList }))
 /*################Routes################*/
 app.use('/auth/',authRoutes)
 app.use('/api/',taskRoutes)
