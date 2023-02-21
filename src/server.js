@@ -8,7 +8,6 @@ const app = express()
 const authRoutes = require('./routes/authRoutes')
 const taskRoutes = require('./routes/toDoRoutes')
 
-const whiteList = ['http://localhost:5173', 'https://andresmaldonado24.github.io/project-todolist/']
 
 /*################Settings################*/
 app.set('port', process.env.PORT || 3000)
@@ -22,7 +21,7 @@ app.use( (req,res,next) => {
 	next()
 });
 app.use(express.json())
-app.use(cors({ origin : whiteList }))
+app.use(cors())
 /*################Routes################*/
 app.use('/auth/',authRoutes)
 app.use('/api/',taskRoutes)
