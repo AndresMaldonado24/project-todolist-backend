@@ -27,7 +27,9 @@ exports.addTask = async (req, res) => {
 		}
 		TaskSchema(newTask)
 		.save()
-		.then( () => res.status(201).send('Task Saved Sucsefully!'))
+		.then( (data) => {
+			res.status(201).send(data._id.toHexString())
+		})
 		.catch( (err) =>{ 
 			res.status(500) 
 			console.log(err)
